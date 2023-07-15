@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>贪吃蛇游戏</title>
+    <style>
+        .game-board {
+            position: relative;
+            height: 400px;
+            width: 400px;
+            border: 1px solid black;
+        }
+
+        .dot {
+            position: absolute;
+            height: 20px;
+            width: 20px;
+        }
+
+        .snake-dot {
+            background: green;
+        }
+
+        .food-dot {
+            background: red;
+        }
+    </style>
+</head>
+<body>
+<div class="game-board"></div>
+
+<script>
+  // 定义一些常量和变量
+  const dotSize = 20 // 每个点的大小（像素）
+  const gameBoardSize = 400 // 游戏板的大小（像素）
+  let direction = 'Right' // 蛇的初始移动方向
+  let snake = [{ top: 0, left: 0 }] // 蛇的初始位置
+  let food = null // 食物的初始位置
+
+  // 更新游戏板的函数
+  const updateGameBoard = () => {
+    const gameBoard = document.querySelector('.game-board') // 获取游戏板元素
+    // console.log(gameBoard.innerHTML) // 打印游戏板的内容
+
+    // 清除旧的游戏板
+    gameBoard.innerHTML = ''
+
+    // 绘制蛇
+    for (const dot of snake) {
+      const snakeDot = document.createElement('div') // 创建一个新的div元素来表示蛇的一部分
+      snakeDot.classList.add('dot', 'snake-dot') // 添加样式
+      snakeDot.style.top = `${dot.top}px` // 设置位置
+      snakeDot.style.left = `${dot.left}px` // 设置位置
+      gameBoard.appendChild(snakeDot) // 将蛇的这一部分添加到游戏板上
+    }
+
+    // 绘制食物
+    if (food === null) {
+      // 创建新的食物
+      food = {
+        top: Math.floor(Math.random() * gameBoardSize / dotSize) * dotSize,
+        left: Math.floor(Math.random() * gameBoardSize / dotSize) * dotSize,
+      }
+    }
+    const foodDot = document.createElement('div') // 创建一个新的div元素来表示食物
+    foodDot.classList.add('dot', 'food-dot') // 添加样式
+    foodDot.style.top = `${food.top}px` // 设置位置
+    foodDot.style.left = `${food.left}px` // 设置位置
+    gameBoard.appendChild(foodDot) // 将食物添加到游戏板上
+  }
+
+  // 更新蛇的位置的函数
+  const updateSnake = () => {
+    const head = { ...snake[0] } // 复制蛇头的位置
+    switch (direction) { // 根据方向更新蛇头的位置
+      case 'Left':
+        head.left -= dotSize
+        break
+      case 'Up':
+        head.top -= dotSize
+        break
+      case 'Right':
+        head.left += dotSize
+        break
+      case 'Down':
+        head.top += dotSize
+        break
+    }
+    snake.unshift(head) // 将新的蛇头添加到蛇的前面
+
+    if (food && food.top === head.top && food.left === head.left) {
+      food = null // 如果蛇头的位置和食物的位置相同，表示蛇吃到了食物，然后移除食物
+    } else {
+      snake.pop() // 如果蛇头的位置和食物的位置不同，表示蛇没有吃到食物，然后移除蛇的尾部
+    }
+  }
+
+  // 处理键盘按键的函数
+  const handleKeydown = (event) => {
+    switch (event.key) { // 根据按键更新方向
+      case 'ArrowUp':
+        direction = 'Up'
+        break
+      case 'ArrowDown':
+        direction = 'Down'
+        break
+      case 'ArrowLeft':
+        direction = 'Left'
+        break
+      case 'ArrowRight':
+        direction = 'Right'
+        break
+    }
+  }
+
+  // 每200毫秒更新一次蛇的位置和游戏板
+  setInterval(() => {
+    updateSnake()
+    updateGameBoard()
+  }, 200) // 更新频率（毫秒）
+
+  // 监听键盘按键事件
+  window.addEventListener('keydown', handleKeydown)
+</script>
+</body>
+</html>
